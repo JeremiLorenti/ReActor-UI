@@ -1,5 +1,6 @@
 __pycache__/
 venv_refactor/
+images/*
 *.py[cod]
 *$py.class
 *.pyc
