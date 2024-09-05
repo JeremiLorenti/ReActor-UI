@@ -21,4 +21,4 @@ models/
 temp/
 venv/
 workflow/
-gfpgan/
+gfpgan/ 
