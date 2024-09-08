@@ -7,8 +7,9 @@ import ssl
 import subprocess
 import urllib
 from pathlib import Path
-from typing import List, Any
+from typing import List, Any, Tuple
 from tqdm import tqdm
+import json
 
 import modules.globals
 
@@ -139,3 +140,21 @@ def conditional_download(download_directory_path: str, urls: List[str]) -> None:
 
 def resolve_relative_path(path: str) -> str:
     return os.path.abspath(os.path.join(os.path.dirname(__file__), path))
+
+
+LAST_USED_PATHS_FILE = 'last_used_paths.json'
+
+def save_last_used_paths(source_path: str, target_path: str) -> None:
+    paths = {
+        'source_path': source_path,
+        'target_path': target_path
+    }
+    with open(LAST_USED_PATHS_FILE, 'w') as file:
+        json.dump(paths, file)
+
+def load_last_used_paths() -> Tuple[str, str]:
+    if os.path.exists(LAST_USED_PATHS_FILE):
+        with open(LAST_USED_PATHS_FILE, 'r') as file:
+            paths = json.load(file)
+            return paths.get('source_path', ''), paths.get('target_path', '')
+    return '', ''

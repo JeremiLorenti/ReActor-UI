@@ -23,6 +23,8 @@ from modules.utilities import has_image_extension, is_image, is_video, detect_fp
 
 if 'ROCMExecutionProvider' in modules.globals.execution_providers:
     del torch
+else:
+    modules.globals.execution_providers = ['cuda']  # Default to CUDA if available
 
 warnings.filterwarnings('ignore', category=FutureWarning, module='insightface')
 warnings.filterwarnings('ignore', category=UserWarning, module='torchvision')
@@ -67,6 +69,7 @@ def parse_args() -> None:
     modules.globals.video_quality = args.video_quality
     modules.globals.max_memory = args.max_memory
     modules.globals.execution_providers = decode_execution_providers(args.execution_provider)
+    print(f"Using execution providers: {modules.globals.execution_providers}")  # Add this line for debugging
     modules.globals.execution_threads = args.execution_threads
 
     #for ENHANCER tumbler:
@@ -104,8 +107,12 @@ def encode_execution_providers(execution_providers: List[str]) -> List[str]:
 
 
 def decode_execution_providers(execution_providers: List[str]) -> List[str]:
-    return [provider for provider, encoded_execution_provider in zip(onnxruntime.get_available_providers(), encode_execution_providers(onnxruntime.get_available_providers()))
-            if any(execution_provider in encoded_execution_provider for execution_provider in execution_providers)]
+    available_providers = onnxruntime.get_available_providers()
+    print(f"Available providers: {available_providers}")  # Add this line for debugging
+    selected_providers = [provider for provider, encoded_execution_provider in zip(available_providers, encode_execution_providers(available_providers))
+                          if any(execution_provider in encoded_execution_provider for execution_provider in execution_providers)]
+    print(f"Selected providers: {selected_providers}")  # Add this line for debugging
+    return selected_providers
 
 
 def suggest_max_memory() -> int:
@@ -224,7 +231,15 @@ def start() -> None:
         update_status('Processing to video succeed!')
     else:
         update_status('Processing to video failed!')
+    
+    # Automatically open the generated output
+    open_output(modules.globals.output_path)
 
+def open_output(output_path: str) -> None:
+    if os.path.isfile(output_path):
+        print(f"Output file generated: {os.path.abspath(output_path)}")
+    else:
+        print(f"Output file {output_path} does not exist.")
 
 def destroy() -> None:
     if modules.globals.target_path:

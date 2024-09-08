@@ -10,7 +10,7 @@ import modules.metadata
 from modules.face_analyser import get_one_face
 from modules.capturer import get_video_frame, get_video_frame_total
 from modules.processors.frame.core import get_frame_processors_modules
-from modules.utilities import is_image, is_video, resolve_relative_path
+from modules.utilities import is_image, is_video, resolve_relative_path, save_last_used_paths, load_last_used_paths
 
 ROOT = None
 ROOT_HEIGHT = 700
@@ -38,6 +38,21 @@ def init(start: Callable[[], None], destroy: Callable[[], None]) -> ctk.CTk:
 
     ROOT = create_root(start, destroy)
     PREVIEW = create_preview(ROOT)
+
+    # Load last used paths
+    last_source_path, last_target_path = load_last_used_paths()
+    if last_source_path and is_image(last_source_path):
+        modules.globals.source_path = last_source_path
+        image = render_image_preview(last_source_path, (200, 200))
+        source_label.configure(image=image)
+    if last_target_path and (is_image(last_target_path) or is_video(last_target_path)):
+        modules.globals.target_path = last_target_path
+        if is_image(last_target_path):
+            image = render_image_preview(last_target_path, (200, 200))
+            target_label.configure(image=image)
+        elif is_video(last_target_path):
+            video_frame = render_video_preview(last_target_path, (200, 200))
+            target_label.configure(image=video_frame)
 
     return ROOT
 
@@ -149,6 +164,7 @@ def select_source_path() -> None:
         RECENT_DIRECTORY_SOURCE = os.path.dirname(modules.globals.source_path)
         image = render_image_preview(modules.globals.source_path, (200, 200))
         source_label.configure(image=image)
+        save_last_used_paths(modules.globals.source_path, modules.globals.target_path)  # Save paths
     else:
         modules.globals.source_path = None
         source_label.configure(image=None)
@@ -164,11 +180,13 @@ def select_target_path() -> None:
         RECENT_DIRECTORY_TARGET = os.path.dirname(modules.globals.target_path)
         image = render_image_preview(modules.globals.target_path, (200, 200))
         target_label.configure(image=image)
+        save_last_used_paths(modules.globals.source_path, modules.globals.target_path)  # Save paths
     elif is_video(target_path):
         modules.globals.target_path = target_path
         RECENT_DIRECTORY_TARGET = os.path.dirname(modules.globals.target_path)
         video_frame = render_video_preview(target_path, (200, 200))
         target_label.configure(image=video_frame)
+        save_last_used_paths(modules.globals.source_path, modules.globals.target_path)  # Save paths
     else:
         modules.globals.target_path = None
         target_label.configure(image=None)
