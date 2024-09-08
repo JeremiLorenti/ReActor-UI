@@ -192,6 +192,7 @@ def start() -> None:
             update_status('Processing to image succeed!')
         else:
             update_status('Processing to image failed!')
+        open_output(modules.globals.output_path)  # Display the output
         return
     # process image to videos
     if modules.globals.nsfw == False:
@@ -238,6 +239,8 @@ def start() -> None:
 def open_output(output_path: str) -> None:
     if os.path.isfile(output_path):
         print(f"Output file generated: {os.path.abspath(output_path)}")
+        if not modules.globals.headless:
+            ui.display_output(output_path)  # Call the new function to display the output
     else:
         print(f"Output file {output_path} does not exist.")
 

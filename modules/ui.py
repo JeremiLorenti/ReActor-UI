@@ -263,3 +263,15 @@ def update_preview(frame_number: int = 0) -> None:
         image = ImageOps.contain(image, (PREVIEW_MAX_WIDTH, PREVIEW_MAX_HEIGHT), Image.LANCZOS)
         image = ctk.CTkImage(image, size=image.size)
         preview_label.configure(image=image)
+
+
+def display_output(output_path: str) -> None:
+    if is_image(output_path):
+        image = render_image_preview(output_path, (400, 400))  # Adjust size as needed
+        preview_label.configure(image=image)
+        preview_label.image = image  # Keep a reference to avoid garbage collection
+    elif is_video(output_path):
+        video_frame = render_video_preview(output_path, (400, 400))  # Adjust size as needed
+        preview_label.configure(image=video_frame)
+        preview_label.image = video_frame  # Keep a reference to avoid garbage collection
+    PREVIEW.deiconify()
