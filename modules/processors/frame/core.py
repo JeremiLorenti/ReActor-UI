@@ -29,15 +29,9 @@ def load_frame_processor_module(frame_processor: str) -> Any:
     return frame_processor_module
 
 
-def get_frame_processors_modules(frame_processors: List[str]) -> List[ModuleType]:
-    global FRAME_PROCESSORS_MODULES
+def get_frame_processors_modules(frame_processors: List[str]) -> List[Any]:
+    return [load_frame_processor_module(frame_processor) for frame_processor in frame_processors]
 
-    if not FRAME_PROCESSORS_MODULES:
-        for frame_processor in frame_processors:
-            frame_processor_module = load_frame_processor_module(frame_processor)
-            FRAME_PROCESSORS_MODULES.append(frame_processor_module)
-    set_frame_processors_modules_from_ui(frame_processors)
-    return FRAME_PROCESSORS_MODULES
 
 def set_frame_processors_modules_from_ui(frame_processors: List[str]) -> None:
     global FRAME_PROCESSORS_MODULES
