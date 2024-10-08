@@ -78,6 +78,8 @@ def parse_args() -> None:
     program.add_argument('--execution-provider', help='execution provider', dest='execution_provider', default=['cuda'], choices=suggest_execution_providers(), nargs='+')
     program.add_argument('--execution-threads', help='number of execution threads', dest='execution_threads', type=int, default=suggest_execution_threads())
     program.add_argument('-v', '--version', action='version', version=f'{modules.metadata.name} {modules.metadata.version}')
+    program.add_argument('--log-level', help='Logging level', dest='log_level', default='info',
+                        choices=['debug', 'info', 'warning', 'error', 'critical'])
 
     # register deprecated args
     program.add_argument('-f', '--face', help=argparse.SUPPRESS, dest='source_path_deprecated')
@@ -102,6 +104,7 @@ def parse_args() -> None:
     modules.globals.execution_providers = decode_execution_providers(args.execution_provider)
     logger.info(f"Using execution providers: {modules.globals.execution_providers}")
     modules.globals.execution_threads = args.execution_threads
+    modules.globals.log_level = args.log_level  # Set the log_level in globals
 
     #for ENHANCER tumbler:
     if 'face_enhancer' in args.frame_processor:
