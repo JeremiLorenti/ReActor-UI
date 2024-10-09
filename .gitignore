@@ -60,3 +60,4 @@ last_used_paths.json
 last_used_paths.json
 uploads/ca257f99a45849e1ac0601b60bcab902
 .gitignore
+.aider*
